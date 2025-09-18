@@ -30,56 +30,48 @@ func NewETL(c HTTPClient, st *store.MemoryStore, log *slog.Logger, cfg config.Co
 	return &ETL{c: c, st: st, log: log, cfg: cfg}
 }
 
-type adsResp struct {
-	External struct {
-		Ads struct {
-			Performance []struct {
-				Date        string  `json:"date"`
-				CampaignID  string  `json:"campaign_id"`
-				Channel     string  `json:"channel"`
-				Clicks      int     `json:"clicks"`
-				Impressions int     `json:"impressions"`
-				Cost        float64 `json:"cost"`
-				UTMCampaign string  `json:"utm_campaign"`
-				UTMSource   string  `json:"utm_source"`
-				UTMMedium   string  `json:"utm_medium"`
-			} `json:"performance"`
-		} `json:"ads"`
-	} `json:"external"`
+type adsResp []struct {
+	Date        string  `json:"date"`
+	CampaignID  string  `json:"campaign_id"`
+	Channel     string  `json:"channel"`
+	Clicks      int     `json:"clicks"`
+	Impressions int     `json:"impressions"`
+	Cost        float64 `json:"cost"`
+	UTMCampaign string  `json:"utm_campaign"`
+	UTMSource   string  `json:"utm_source"`
+	UTMMedium   string  `json:"utm_medium"`
 }
 
-type crmResp struct {
-	External struct {
-		CRM struct {
-			Opportunities []struct {
-				OpportunityID string  `json:"opportunity_id"`
-				ContactEmail  string  `json:"contact_email"`
-				Stage         string  `json:"stage"`
-				Amount        float64 `json:"amount"`
-				CreatedAt     string  `json:"created_at"`
-				UTMCampaign   string  `json:"utm_campaign"`
-				UTMSource     string  `json:"utm_source"`
-				UTMMedium     string  `json:"utm_medium"`
-			} `json:"opportunities"`
-		} `json:"crm"`
-	} `json:"external"`
+type crmResp []struct {
+	OpportunityID string  `json:"opportunity_id"`
+	ContactEmail  string  `json:"contact_email"`
+	Stage         string  `json:"stage"`
+	Amount        float64 `json:"amount"`
+	CreatedAt     string  `json:"created_at"`
+	UTMCampaign   string  `json:"utm_campaign"`
+	UTMSource     string  `json:"utm_source"`
+	UTMMedium     string  `json:"utm_medium"`
 }
 
 func (e *ETL) Run(ctx context.Context, since *time.Time) error {
 	bo := utils.NewBackoff(200*time.Millisecond, 3)
 	// ADS
 	var aResp adsResp
-	if err := bo.Do(func(i int) error { return getJSON(ctx, e.c, e.cfg.AdsURL, &aResp) }); err != nil {
+	if err := bo.Do(func(i int) error {
+		return getJSON(ctx, e.c, e.cfg.AdsURL, &aResp)
+	}); err != nil {
 		return err
 	}
 	// CRM
 	var cResp crmResp
-	if err := bo.Do(func(i int) error { return getJSON(ctx, e.c, e.cfg.CrmURL, &cResp) }); err != nil {
+	if err := bo.Do(func(i int) error {
+		return getJSON(ctx, e.c, e.cfg.CrmURL, &cResp)
+	}); err != nil {
 		return err
 	}
 
 	// Normalizar + filtrar fechas
-	for _, r := range aResp.External.Ads.Performance {
+	for _, r := range aResp {
 		d, err := time.Parse("2006-01-02", strings.TrimSpace(r.Date))
 		if err != nil {
 			continue
@@ -104,7 +96,7 @@ func (e *ETL) Run(ctx context.Context, since *time.Time) error {
 		})
 	}
 
-	for _, r := range cResp.External.CRM.Opportunities {
+	for _, r := range cResp {
 		if r.CreatedAt == "" {
 			continue
 		}
