@@ -1,4 +1,4 @@
-module github.com/angelcm/admira-etl-go
+module github.com/AngelCh415/ELT_GO
 
 
 go 1.22
