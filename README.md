@@ -61,29 +61,43 @@ curl -XPOST "http://localhost:8080/export/run?date=2025-08-01"
 
 ## 📐 Suposiciones
 
+- En CRM:  
+  - Cada oportunidad creada cuenta como **lead**.  
+  - `stage="opportunity"` acumula en **opportunities**.  
+  - `stage="closed_won"` acumula tanto en **opportunities** como en **closed_won** y suma al **revenue**.  
+- El cruce Ads↔CRM se hace por **día + triple UTM (`utm_campaign`, `utm_source`, `utm_medium`)**.  
+  - Si existen Ads y CRM en la misma fecha/UTMs, se **unen en un solo agregado**.  
+  - Si no hay match de Ads, CRM cae a una clave “vacía” (`channel=""`), para no perder leads.  
+- Normalización:  
+  - UTMs ausentes se transforman a `unknown`.  
+  - Fechas se truncan al día (`YYYY-MM-DD`).  
+  - Valores negativos de clicks, impresiones y costos se normalizan a cero.  
 
-- En CRM, toda oportunidad creada cuenta como **lead**; `stage` acumula **opportunities** y **closed_won**.
-- Cruce UTM: si faltan UTM en alguna fuente, se normaliza a `unknown` para mantener la agregación.
-- Agregación **diaria**; la hora se trunca al día.
-
-
-## 🔍 Observabilidad
-
-
-- Logging estructurado JSON con `X-Request-ID` y latencias.
-- (Opcional) Puedes añadir `/metrics` Prometheus fácilmente con `promhttp.Handler()`.
-
-
-## 🧪 Tests
-
-- `TestDerivedMetricsSafeDiv`: asegura que las divisiones estén protegidas (no division-by-zero).
-- `TestHTTPClientHandles500`: maneja errores HTTP 500.
-- `TestHTTPClientHandles404`: maneja errores HTTP 404.
-- `TestHTTPClientHandlesTimeout`: maneja timeouts de red.
-
+---
 
 ## 🧱 Limitaciones
 
+- **Persistencia:** El almacenamiento es solo **en memoria**; al reiniciar se pierden datos. En producción → usar DB o data lake.  
+- **Unión Ads↔CRM:**  
+  - Se basa únicamente en **día + UTM triple**.  
+  - No distingue cuando múltiples campañas comparten UTMs → posible agregación conjunta.  
+- **Escalabilidad:** Procesamiento secuencial; no hay worker pools ni particionamiento implementado.  
+- **Validación de datos:** Se asume que los payloads cumplen el contrato; faltan validaciones estrictas de tipos y rangos.  
+- **Exportación:** `/export/run` requiere `SINK_URL` y `SINK_SECRET`; si no están configurados, responde `"sink not configured"`.  
 
-- Almacenamiento **en memoria** (ideal para prueba). En producción: persistencia (SQL/OLAP) y esquemas.
-- Unión de Ads↔CRM se hace por **triple UTM**; si hay múltiples canales para el mismo UTM en un día, se mantienen por clave (channel/campaign_id) del lado de Ads y por UTM del lado CRM.
+---
+
+## 🔍 Observabilidad
+
+- **Healthchecks**:  
+  - `GET /healthz` → confirma que el servicio está vivo.  
+  - `GET /readyz` → confirma que el servicio está listo para recibir tráfico.  
+- **Logging estructurado**:  
+  - Salida en JSON con nivel de log y `X-Request-ID` para trazabilidad.  
+  - Incluye latencias por request.  
+- **Manejo de errores de red**:  
+  - Timeouts configurables en cliente HTTP.  
+  - Retries con backoff exponencial en ingesta.  
+  - Tests unitarios cubren casos 4xx, 5xx y timeouts.  
+- **Métricas (opcional)**:  
+  - Puede integrarse `/metrics` para Prometheus usando `promhttp.Handler()`.  
