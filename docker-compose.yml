@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+api:
+build: .
+ports:
+- "8080:8080"
+env_file:
+- .env
+environment:
+- PORT=${PORT}
+- ADS_API_URL=${ADS_API_URL}
+- CRM_API_URL=${CRM_API_URL}
+- SINK_URL=${SINK_URL}
+- SINK_SECRET=${SINK_SECRET}
+- LOG_LEVEL=debug
