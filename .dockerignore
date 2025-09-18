@@ -1,0 +1,36 @@
+# Git & VCS
+.git
+.gitignore
+.gitattributes
+
+# Archivos locales y envs
+.env
+.env.*
+*.log
+
+# Documentación y archivos de proyecto
+README.md
+SYSTEM_DESIGN.md
+*.md
+Dockerfile
+docker-compose.yml
+Makefile
+
+# Directorios de build/cache
+bin/
+build/
+dist/
+mnt/
+tmp/
+
+# Archivos de pruebas
+*_test.go
+*.out
+coverage.*
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store

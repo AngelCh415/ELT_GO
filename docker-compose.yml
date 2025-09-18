@@ -1,15 +1,23 @@
 version: "3.9"
+
 services:
-api:
-build: .
-ports:
-- "8080:8080"
-env_file:
-- .env
-environment:
-- PORT=${PORT}
-- ADS_API_URL=${ADS_API_URL}
-- CRM_API_URL=${CRM_API_URL}
-- SINK_URL=${SINK_URL}
-- SINK_SECRET=${SINK_SECRET}
-- LOG_LEVEL=debug
+  api:
+    build: .
+    container_name: admira-etl
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+      - ADS_API_URL=${ADS_API_URL}
+      - CRM_API_URL=${CRM_API_URL}
+      - SINK_URL=${SINK_URL}
+      - SINK_SECRET=${SINK_SECRET}
+      - LOG_LEVEL=debug
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
