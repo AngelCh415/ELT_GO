@@ -1,12 +1,29 @@
 # ELT_GO# Admira ETL (Go)
-## 🚀 Correr
 
+## 📦 Requisitos
+
+- Go 1.22+
+- Docker + Docker Compose
+- Make
+
+## ⚙️ Configuración
+
+Copia el archivo de ejemplo:
 
 ```bash
 cp .env.example .env
-# edita ADS_API_URL / CRM_API_URL
+```
+
+## 🚀 Correr
+
+```bash
+# servidor local
 make run
-# o
+
+# ejecutar tests
+make test
+
+# levantar con Docker
 docker compose up --build
 ```
 
@@ -59,8 +76,10 @@ curl -XPOST "http://localhost:8080/export/run?date=2025-08-01"
 
 ## 🧪 Tests
 
-
-- Tests unitarios mínimos en `test/etl_transform_test.go`. Agrega casos adicionales según tus contratos de datos.
+- `TestDerivedMetricsSafeDiv`: asegura que las divisiones estén protegidas (no division-by-zero).
+- `TestHTTPClientHandles500`: maneja errores HTTP 500.
+- `TestHTTPClientHandles404`: maneja errores HTTP 404.
+- `TestHTTPClientHandlesTimeout`: maneja timeouts de red.
 
 
 ## 🧱 Limitaciones
