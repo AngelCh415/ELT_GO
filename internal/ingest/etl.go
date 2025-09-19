@@ -16,7 +16,6 @@ import (
 	"github.com/AngelCh415/ELT_GO/internal/config"
 	"github.com/AngelCh415/ELT_GO/internal/models"
 	"github.com/AngelCh415/ELT_GO/internal/store"
-	"github.com/AngelCh415/ELT_GO/internal/utils"
 )
 
 type ETL struct {
@@ -54,19 +53,14 @@ type crmResp []struct {
 }
 
 func (e *ETL) Run(ctx context.Context, since *time.Time) error {
-	bo := utils.NewBackoff(200*time.Millisecond, 3)
 	// ADS
 	var aResp adsResp
-	if err := bo.Do(func(i int) error {
-		return getJSON(ctx, e.c, e.cfg.AdsURL, &aResp)
-	}); err != nil {
+	if err := GetJSONWithRetry(e.c, e.cfg.AdsURL, &aResp); err != nil {
 		return err
 	}
 	// CRM
 	var cResp crmResp
-	if err := bo.Do(func(i int) error {
-		return getJSON(ctx, e.c, e.cfg.CrmURL, &cResp)
-	}); err != nil {
+	if err := GetJSONWithRetry(e.c, e.cfg.CrmURL, &cResp); err != nil {
 		return err
 	}
 
