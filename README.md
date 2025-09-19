@@ -1,4 +1,4 @@
-# ELT_GO# Admira ETL (Go)
+# Admira ETL (Go)
 
 ## 📦 Requisitos
 
@@ -84,6 +84,8 @@ curl -XPOST "http://localhost:8080/export/run?date=2025-08-01"
 - **Escalabilidad:** Procesamiento secuencial; no hay worker pools ni particionamiento implementado.  
 - **Validación de datos:** Se asume que los payloads cumplen el contrato; faltan validaciones estrictas de tipos y rangos.  
 - **Exportación:** `/export/run` requiere `SINK_URL` y `SINK_SECRET`; si no están configurados, responde `"sink not configured"`.  
+- **Nota**: aunque la prueba pedía Mocky, se utilizó **MockAPI** para exponer los endpoints de prueba (más estable).
+
 
 ---
 
@@ -133,7 +135,10 @@ GET http://localhost:8080/metrics/channel?from=2025-08-01&to=2025-08-31&channel=
 
 ### Funnel por UTM
 GET http://localhost:8080/metrics/funnel?from=2025-08-01&to=2025-08-31&utm_campaign=back_to_school
+
 ```
+
+
 
 ## 📤 Ejemplos de llamadas y respuestas
 
