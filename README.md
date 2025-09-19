@@ -42,20 +42,29 @@ docker compose up --build
 
 
 ```bash
-# 1) Ingesta completa desde 2025-08-01
-curl -XPOST "http://localhost:8080/ingest/run?since=2025-08-01"
+# 1) Ingesta completa desde una fecha
+curl -X POST "http://localhost:8080/ingest/run?since=YYYY-MM-DD"
 
+# 2) Métricas por canal ─ filtros + paginación
+# 2.1) Filtrar por canal exacto
+curl "http://localhost:8080/metrics/channel?from=YYYY-MM-DD&to=YYYY-MM-DD&channel=google_ads&limit=20&offset=0"
 
-# 2) Métricas por canal
-curl "http://localhost:8080/metrics/channel?from=2025-08-01&to=2025-08-31&channel=google_ads&limit=20&offset=0"
+# 2.2) Filtrar por múltiples canales (CSV) + paginación
+curl "http://localhost:8080/metrics/channel?from=YYYY-MM-DD&to=YYYY-MM-DD&channel=google_ads,meta_ads&limit=10&offset=10"
 
+# 2.3) Filtrar por campaign_id específico (además del canal)
+curl "http://localhost:8080/metrics/channel?from=YYYY-MM-DD&to=YYYY-MM-DD&channel=google_ads&campaign_id=C-1001&limit=5&offset=0"
 
-# 3) Funnel por UTM
-curl "http://localhost:8080/metrics/funnel?from=2025-08-01&to=2025-08-31&utm_campaign=back_to_school"
+# 3) Funnel por UTM ─ filtros + paginación
+# 3.1) Por utm_campaign solamente
+curl "http://localhost:8080/metrics/funnel?from=YYYY-MM-DD&to=YYYY-MM-DD&utm_campaign=back_to_school&limit=50&offset=0"
 
+# 3.2) Por triple UTM (utm_campaign, utm_source, utm_medium)
+curl "http://localhost:8080/metrics/funnel?from=YYYY-MM-DD&to=YYYY-MM-DD&utm_campaign=back_to_school&utm_source=google&utm_medium=cpc&limit=10&offset=0"
 
-# 4) Exportación diaria (opcional)
-curl -XPOST "http://localhost:8080/export/run?date=2025-08-01"
+# 4) Exportación diaria (envía al SINK_URL con HMAC en X-Signature)
+curl -X POST "http://localhost:8080/export/run?date=YYYY-MM-DD"
+
 ```
 
 
