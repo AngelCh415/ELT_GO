@@ -1,0 +1,74 @@
+{
+    "info": {
+      "name": "Admira ETL",
+      "_postman_id": "8d53cfa2-6b27-4a5c-9f11-123456789abc",
+      "description": "Colección de pruebas para el servicio Admira ETL (Go)",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Ingestar datos",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "url": {
+            "raw": "{{baseUrl}}/ingest/run?since=2025-08-01",
+            "host": ["{{baseUrl}}"],
+            "path": ["ingest", "run"],
+            "query": [
+              {
+                "key": "since",
+                "value": "2025-08-01"
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Métricas por canal",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{baseUrl}}/metrics/channel?from=2025-08-01&to=2025-08-31&channel=google_ads&limit=10&offset=0",
+            "host": ["{{baseUrl}}"],
+            "path": ["metrics", "channel"],
+            "query": [
+              { "key": "from", "value": "2025-08-01" },
+              { "key": "to", "value": "2025-08-31" },
+              { "key": "channel", "value": "google_ads" },
+              { "key": "limit", "value": "10" },
+              { "key": "offset", "value": "0" }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Funnel por UTM",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{baseUrl}}/metrics/funnel?from=2025-08-01&to=2025-08-31&utm_campaign=back_to_school",
+            "host": ["{{baseUrl}}"],
+            "path": ["metrics", "funnel"],
+            "query": [
+              { "key": "from", "value": "2025-08-01" },
+              { "key": "to", "value": "2025-08-31" },
+              { "key": "utm_campaign", "value": "back_to_school" }
+            ]
+          }
+        },
+        "response": []
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:8080"
+      }
+    ]
+  }
+  

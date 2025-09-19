@@ -1,0 +1,10 @@
+### 1) Ingestar datos desde una fecha
+POST http://localhost:8080/ingest/run?since=2025-08-01
+
+
+### 2) Métricas por canal (google_ads en agosto 2025)
+GET http://localhost:8080/metrics/channel?from=2025-08-01&to=2025-08-31&channel=google_ads&limit=10&offset=0
+
+
+### 3) Funnel por UTM (campaña back_to_school)
+GET http://localhost:8080/metrics/funnel?from=2025-08-01&to=2025-08-31&utm_campaign=back_to_school
